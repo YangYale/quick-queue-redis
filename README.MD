@@ -47,6 +47,38 @@ spring.redis.pool.max-active=-1
         @RedisQueueProvider("queue2")
         void sendMessage2(List<String> msgList);
     }
+    
+    //消息发送
+    @Component
+    @EnableScheduling
+    public class QueueTask {
+        @Autowired
+        private TestQueue testQueue;
+    
+        @Autowired
+        private TestQueue1 testQueue1;
+    
+        @Scheduled(cron = "0/5 * * * * ?")
+        public void queue1Task(){
+            //定义好消息队列的接口可直接调用，不需要管实现，实现由代理完成
+            testQueue.sendMessage1("Msg:[" + (int)(Math.random() * Integer.MAX_VALUE) + "]");
+        }
+    
+        @Scheduled(cron = "0/10 * * * * ?")
+        public void queue2Task(){
+            testQueue.sendMessage2(Arrays.asList("Hello ","World."));
+        }
+    
+        @Scheduled(cron = "0/5 * * * * ?")
+        public void queue3Task(){
+            testQueue1.sendMessage1("Msg:[" + (int)(Math.random() * Integer.MAX_VALUE) + "]");
+        }
+    
+        @Scheduled(cron = "0/10 * * * * ?")
+        public void queue4Task(){
+            testQueue1.sendMessage2(Arrays.asList("Hello ","World."));
+        }
+    }
 ```
 ##### 消费者
 ```java
